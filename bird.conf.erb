@@ -1,0 +1,30 @@
+router id <%= @host %>;
+
+protocol device {
+  scan time 10;
+}
+
+protocol direct {
+  ipv4;
+  interface "*";
+}
+
+protocol kernel {
+  learn;
+  ipv4 {
+    import none;
+    export all;
+  };
+}
+
+<% for peer in @peers %>
+protocol bgp <%= peer[:name].gsub('-', '').gsub(/^[0-9]/) { |w| "_#{w}" } %> {
+  description "<%= peer[:name] %>";
+  local <%= peer[:local_host] %> as <%= @as %>;
+  neighbor <%= peer[:remote_host] %> as <%= peer[:as] %>;
+  ipv4 {
+    import all;
+    export all;
+  };
+}
+<% end %>
